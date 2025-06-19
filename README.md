@@ -11,15 +11,6 @@ It is intended to raise awareness of marine heatwaves and coral bleaching events
 
 This graph shows the daily average deviation from normal temperatures within the GBR polygon. Positive anomalies (in red) indicate above-normal temperatures that may contribute to coral stress.
 
-### 2. Degree Heating Weeks (DHW)
-![DHW Time Series](output/dhw_map.png)
-
-This graph accumulates thermal stress over time. DHW ≥ 4 °C-weeks indicates **significant bleaching risk**, while DHW ≥ 8 °C-weeks often leads to **widespread coral mortality**.
-
----
-
-## 📍 How it works
-
 1. **Raw data**: We fetch CSV files from NOAA’s ERDDAP API. Each file includes:
    - `latitude`, `longitude`, `time`
    - `sea_surface_temperature_anomaly` (in °C)
@@ -31,13 +22,19 @@ This graph accumulates thermal stress over time. DHW ≥ 4 °C-weeks indicates
 3. **Aggregation**:
    - Daily SST anomalies are averaged over all GBR points.
 
-4. **DHW calculation**:
+### 2. Degree Heating Weeks (DHW)
+![DHW Time Series](output/dhw_map.png)
+
+This graph accumulates thermal stress over time. 
+DHW ≥ 2 °C-weeks indicates **mild Stress**,
+DHW ≥ 4 °C-weeks indicates **significant bleaching risk**,
+DHW ≥ 8 °C-weeks often leads to **widespread coral mortality**.
+
+**DHW calculation**:
    - For each day and location:
      - SST anomaly values are accumulated **only when they exceed 1 °C**.
      - The sum of these values over the **last 84 days (12 weeks)** is calculated and divided by 7 to get °C-weeks.
-   - We then average DHW values across the GBR.
-
----
+   - We then map out this DHW over a shapefile of the Great Barrier Reef.
 
 ## 🛠️ Setup
 
