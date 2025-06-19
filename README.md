@@ -12,7 +12,7 @@ It is intended to raise awareness of marine heatwaves and coral bleaching events
 This graph shows the daily average deviation from normal temperatures within the GBR polygon. Positive anomalies (in red) indicate above-normal temperatures that may contribute to coral stress.
 
 ### 2. Degree Heating Weeks (DHW)
-![DHW Time Series](output/dhw_timeseries.png)
+![DHW Time Series](output/dhw_map.png)
 
 This graph accumulates thermal stress over time. DHW ≥ 4 °C-weeks indicates **significant bleaching risk**, while DHW ≥ 8 °C-weeks often leads to **widespread coral mortality**.
 
