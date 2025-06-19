@@ -1,0 +1,40 @@
+name: Daily Coral Map Update
+
+on:
+  schedule:
+    - cron: '0 18 * * *'  # Runs every day at 18:00 UTC
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gdal-bin libgdal-dev
+        pip install -r requirements.txt
+
+    - name: Run notebooks in order
+      run: |
+        papermill code/api_call.ipynb code/api_call_out.ipynb
+        papermill code/DHW_Calculation.ipynb code/DHW_Calculation_out.ipynb
+        papermill code/map.ipynb code/map_out.ipynb
+        papermill code/line_sst_anomaly.ipynb code/line_sst_anomaly_out.ipynb
+
+    - name: Commit updated plots and data
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add output/*.png data/base/*.csv
+        git commit -m "Auto-update: new daily SST, DHW, and maps" || echo "No changes"
+        git push
