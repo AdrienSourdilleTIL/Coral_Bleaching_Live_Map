@@ -5,23 +5,23 @@
 
 
 import pandas as pd
-import os
+from pathlib import Path
 from datetime import datetime, timedelta
 
 def load_and_calculate_dhw(project_root, base_subpath="data/raw/daily", days=84, threshold=1.0):
-    base_path = os.path.join(project_root, base_subpath)
+    base_path = project_root / base_subpath
     end_date = datetime.utcnow().date() - timedelta(days=2)  # data availability delay
-    start_date = end_date - timedelta(days=days-1)
+    start_date = end_date - timedelta(days=days - 1)
 
     dfs = []
 
     for day_delta in range(days):
         date = start_date + timedelta(days=day_delta)
-        folder = os.path.join(base_path, str(date.year), f"{date.month:02d}", f"{date.day:02d}")
+        folder = base_path / str(date.year) / f"{date.month:02d}" / f"{date.day:02d}"
         filename = f"sst_anomaly_{date.strftime('%Y_%m_%d')}.csv"
-        filepath = os.path.join(folder, filename)
+        filepath = folder / filename
 
-        if os.path.exists(filepath):
+        if filepath.exists():
             df = pd.read_csv(filepath, skiprows=[1])
             df = df[['time', 'latitude', 'longitude', 'sea_surface_temperature_anomaly']]
             df['sea_surface_temperature_anomaly'] = pd.to_numeric(df['sea_surface_temperature_anomaly'], errors='coerce')
@@ -37,8 +37,7 @@ def load_and_calculate_dhw(project_root, base_subpath="data/raw/daily", days=84,
     all_data.loc[all_data['thermal_stress'] < 0, 'thermal_stress'] = 0
 
     dhw_df = (
-        all_data.groupby(['latitude', 'longitude'])
-        ['thermal_stress']
+        all_data.groupby(['latitude', 'longitude'])['thermal_stress']
         .sum()
         .reset_index()
     )
@@ -50,14 +49,16 @@ def load_and_calculate_dhw(project_root, base_subpath="data/raw/daily", days=84,
 
     return dhw_df
 
+
 if __name__ == "__main__":
-    # Put your actual project root path here:
-    project_root = r"C:\Users\AdrienSourdille\Coral_Bleaching_Live_Map"
+    # Automatically resolve project root based on current script's location
+    project_root = Path(__file__).resolve().parents[1]
+    print(f"Using project root: {project_root}")  # Debug line for CI troubleshooting
 
     dhw = load_and_calculate_dhw(project_root)
-    output_folder = os.path.join(project_root, "data", "base")
-    os.makedirs(output_folder, exist_ok=True)
-    output_path = os.path.join(output_folder, "dhw_12weeks.csv")
+    output_folder = project_root / "data" / "base"
+    output_folder.mkdir(parents=True, exist_ok=True)
+
+    output_path = output_folder / "dhw_12weeks.csv"
     dhw.to_csv(output_path, index=False)
     print(f"DHW calculation complete and saved to {output_path}")
-
