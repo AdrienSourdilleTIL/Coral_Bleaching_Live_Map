@@ -11,7 +11,7 @@ project_root = Path(__file__).resolve().parents[1]
 
 # Paths
 daily_data_root = project_root / "data" / "raw" / "daily"
-gbr_shapefile_path = project_root / "data" / "raw" / "shapefile" / "worldheritagemarineprogramme.shp"
+gbr_shapefile_path = project_root / "data" / "raw" / "shapefile_gbr" / "worldheritagemarineprogramme.shp"
 output_plot_path = project_root / "output" / "sst_anomaly_timeseries.png"
 
 # Load GBR polygon

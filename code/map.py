@@ -13,7 +13,7 @@ print(f"Using project root: {project_root}")
 
 # Define paths
 shapefile_gbr = project_root / "data" / "raw" / "shapefile_gbr" / "worldheritagemarineprogramme.shp"
-shapefile_gbr_features = project_root / "data" / "raw" / "shapefile_gbr" / "Great_Barrier_Reef_Features.shp"
+shapefile_gbr_features = project_root / "data" / "raw" / "shapefile" / "Great_Barrier_Reef_Features.shp"
 csv_path = project_root / "data" / "base" / "dhw_12weeks.csv"
 output_path = project_root / "output" / "dhw_map.png"
 
