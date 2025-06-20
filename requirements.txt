@@ -4,5 +4,3 @@ matplotlib
 cartopy
 geopandas
 contextily
-papermill
-nbconvert
