@@ -1,25 +1,24 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[10]:
-
-
 import pandas as pd
 import geopandas as gpd
 import matplotlib.pyplot as plt
 from pathlib import Path
-from shapely.geometry import Point
+
+# Resolve project root
+project_root = Path(__file__).resolve().parents[1]
 
 # Paths
-daily_data_root = Path(r"C:\Users\AdrienSourdille\Coral_Bleaching_Live_Map\data\raw\daily")
-gbr_shapefile_path = r"C:\Users\AdrienSourdille\Coral_Bleaching_Live_Map\data\raw\shapefile_gbr\worldheritagemarineprogramme.shp"
-output_plot_path = r"C:\Users\AdrienSourdille\Coral_Bleaching_Live_Map\output\sst_anomaly_timeseries.png"
+daily_data_root = project_root / "data" / "raw" / "daily"
+gbr_shapefile_path = project_root / "data" / "raw" / "shapefile_gbr" / "worldheritagemarineprogramme.shp"
+output_plot_path = project_root / "output" / "sst_anomaly_timeseries.png"
 
 # Load GBR polygon
 gbr_gdf = gpd.read_file(gbr_shapefile_path).to_crs("EPSG:4326")
 
-# Load and combine all daily CSVs
-csv_files = list(daily_data_root.rglob("sst_anomaly_*.csv"))
+# Load and combine all daily SST anomaly CSVs
+csv_files = sorted(daily_data_root.rglob("sst_anomaly_*.csv"))
 records = []
 
 for csv_file in csv_files:
@@ -35,8 +34,11 @@ all_data = pd.concat(records, ignore_index=True)
 all_data['time'] = pd.to_datetime(all_data['time'])
 
 # Convert to GeoDataFrame
-geometry = gpd.points_from_xy(all_data.longitude, all_data.latitude)
-gdf_all = gpd.GeoDataFrame(all_data, geometry=geometry, crs="EPSG:4326")
+gdf_all = gpd.GeoDataFrame(
+    all_data,
+    geometry=gpd.points_from_xy(all_data.longitude, all_data.latitude),
+    crs="EPSG:4326"
+)
 
 # Spatial filter: keep only points inside GBR polygon
 gdf_filtered = gdf_all[gdf_all.within(gbr_gdf.unary_union)]
@@ -54,6 +56,7 @@ plt.ylabel('SST Anomaly (°C)')
 plt.title('Daily Average Sea Surface Temperature Anomaly in the GBR')
 plt.grid(True)
 plt.tight_layout()
-plt.savefig(output_plot_path)
+plt.savefig(output_plot_path, dpi=300)
 plt.close()
 
+print(f"Time series plot saved to: {output_plot_path}")
