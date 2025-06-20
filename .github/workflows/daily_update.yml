@@ -31,7 +31,7 @@ jobs:
     - name: Run scripts in order
       run: |
         python code/api_call.py
-        python code/DHW_Calculation.py
+        python code/DHW_calculation.py
         python code/map.py
         python code/line_sst_anomaly.py
 

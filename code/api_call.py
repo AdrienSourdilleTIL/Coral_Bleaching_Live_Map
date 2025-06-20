@@ -10,7 +10,7 @@ import os
 
 def fetch_sst_anomaly():
     # Use 2 days ago to ensure data availability
-    date = datetime.utcnow().date() - timedelta(days=48)
+    date = datetime.utcnow().date() - timedelta(days=2)
     timestamp = date.strftime("%Y-%m-%dT12:00:00Z")
 
     dataset_id = "noaacrwsstanomalyDaily"
