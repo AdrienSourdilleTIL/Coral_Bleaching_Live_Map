@@ -12,11 +12,13 @@ project_root = Path(__file__).resolve().parents[1]
 print(f"Using project root: {project_root}")
 
 # Define paths
+shapefile_gbr_zone = project_root / "data" / "raw" / "shapefile_gbr" / "worldheritagemarineprogramme.shp"
 shapefile_gbr_features = project_root / "data" / "raw" / "shapefile" / "Great_Barrier_Reef_Features.shp"
 csv_path = project_root / "data" / "base" / "dhw_12weeks.csv"
 output_path = project_root / "output" / "dhw_map.png"
 
-# Load GBR features
+# Load GBR zone and features
+gbr_zone = gpd.read_file(shapefile_gbr_zone).to_crs("EPSG:4326")
 gbr_features = gpd.read_file(shapefile_gbr_features).to_crs("EPSG:4326")
 
 # Load SST anomaly data
@@ -29,17 +31,18 @@ sst_gdf = gpd.GeoDataFrame(
     crs="EPSG:4326"
 )
 
-# Compute average DHW
-mean_dhw = sst_gdf['DHW'].mean()
-print(f"Average DHW (all data): {mean_dhw:.2f}°C·weeks")
+# Filter points within GBR zone
+sst_in_gbr = gpd.sjoin(sst_gdf, gbr_zone, predicate='within', how='inner')
+
+# Compute average DHW inside GBR zone
+mean_dhw = sst_in_gbr['DHW'].mean()
+print(f"Average DHW inside GBR zone: {mean_dhw:.2f}°C·weeks")
 
 # Current date
 current_date = datetime.now().strftime("%Y-%m-%d")
 
-# Plot DHW points
+# Plot all DHW points (unfiltered)
 fig, ax = plt.subplots(figsize=(10, 8))
-
-# Plot DHW points with capped max at 10
 sst_gdf.plot(
     ax=ax,
     column='DHW',
@@ -50,12 +53,12 @@ sst_gdf.plot(
     vmax=10
 )
 
-# Plot GBR feature outlines in black with thin lines
+# Plot GBR features boundary (thin black line)
 gbr_features.boundary.plot(ax=ax, color='black', linewidth=0.1)
 
 # Titles and labels
 ax.set_title(
-    f"12-Week Cumulative Heat Stress (DHW) – {current_date}\nAvg DHW: {mean_dhw:.2f}°C·weeks",
+    f"12-Week Cumulative Heat Stress (DHW) – {current_date}\nAvg DHW in the GBR zone: {mean_dhw:.2f}°C·weeks",
     fontsize=13
 )
 ax.set_xlabel("Longitude")
