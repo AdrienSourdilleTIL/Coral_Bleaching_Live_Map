@@ -5,20 +5,16 @@ from pathlib import Path
 import geopandas as gpd
 import pandas as pd
 import matplotlib.pyplot as plt
-import contextily as ctx
+from datetime import datetime
 
 # Resolve project root
 project_root = Path(__file__).resolve().parents[1]
 print(f"Using project root: {project_root}")
 
 # Define paths
-shapefile_gbr = project_root / "data" / "raw" / "shapefile_gbr" / "worldheritagemarineprogramme.shp"
 shapefile_gbr_features = project_root / "data" / "raw" / "shapefile" / "Great_Barrier_Reef_Features.shp"
 csv_path = project_root / "data" / "base" / "dhw_12weeks.csv"
 output_path = project_root / "output" / "dhw_map.png"
-
-# Load GBR shapefile
-gbr = gpd.read_file(shapefile_gbr).to_crs("EPSG:4326")
 
 # Load GBR features
 gbr_features = gpd.read_file(shapefile_gbr_features).to_crs("EPSG:4326")
@@ -33,35 +29,35 @@ sst_gdf = gpd.GeoDataFrame(
     crs="EPSG:4326"
 )
 
-# Spatial join: keep only points within GBR polygon
-sst_within_gbr = gpd.sjoin(sst_gdf, gbr, predicate='within', how='inner')
-
 # Compute average DHW
-mean_dhw = sst_within_gbr['DHW'].mean()
-print(f"Average DHW inside GBR: {mean_dhw:.2f}°C·weeks")
+mean_dhw = sst_gdf['DHW'].mean()
+print(f"Average DHW (all data): {mean_dhw:.2f}°C·weeks")
+
+# Current date
+current_date = datetime.now().strftime("%Y-%m-%d")
 
 # Plot DHW points
 fig, ax = plt.subplots(figsize=(10, 8))
 
-# Plot DHW points inside GBR
-sst_within_gbr.plot(
+# Plot DHW points with capped max at 10
+sst_gdf.plot(
     ax=ax,
     column='DHW',
     cmap='hot_r',
     legend=True,
     markersize=10,
-    alpha=0.7
+    alpha=0.7,
+    vmax=10
 )
 
-# Outline GBR region and features
-gbr.boundary.plot(ax=ax, color='black', linewidth=1)
-gbr_features.boundary.plot(ax=ax, color='blue', linewidth=0.8, linestyle='--')
-
-# Add basemap
-ctx.add_basemap(ax, source=ctx.providers.OpenStreetMap.Mapnik, crs=sst_gdf.crs)
+# Plot GBR feature outlines in black with thin lines
+gbr_features.boundary.plot(ax=ax, color='black', linewidth=0.1)
 
 # Titles and labels
-ax.set_title(f"12-Week Cumulative Heat Stress (DHW) – Great Barrier Reef\nAvg DHW: {mean_dhw:.2f}°C·weeks", fontsize=13)
+ax.set_title(
+    f"12-Week Cumulative Heat Stress (DHW) – {current_date}\nAvg DHW: {mean_dhw:.2f}°C·weeks",
+    fontsize=13
+)
 ax.set_xlabel("Longitude")
 ax.set_ylabel("Latitude")
 
