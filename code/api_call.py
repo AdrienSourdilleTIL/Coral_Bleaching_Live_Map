@@ -27,6 +27,7 @@ def fetch_sst_anomaly():
     # Determine project root safely
     from pathlib import Path
     project_root = Path(__file__).resolve().parents[1] if '__file__' in globals() else Path.cwd()
+    print(f"Project root: {project_root}")
 
     # Build folder path relative to project root
     folder_path = os.path.join(
@@ -40,6 +41,7 @@ def fetch_sst_anomaly():
     # Build filename
     filename = f"sst_anomaly_{date.strftime('%Y_%m_%d')}.csv"
     output_path = os.path.join(folder_path, filename)
+    print(f"Attempting to save file to: {output_path}")
 
     print(f"Fetching SST anomaly for {date} from NOAA ERDDAP...")
     response = requests.get(url)
