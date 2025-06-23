@@ -10,7 +10,7 @@ import os
 
 def fetch_sst_anomaly():
     # Use 2 days ago to ensure data availability
-    date = datetime.utcnow().date() - timedelta(days=2)
+    date = datetime.utcnow().date() - timedelta(days=3)
     timestamp = date.strftime("%Y-%m-%dT12:00:00Z")
 
     dataset_id = "noaacrwsstanomalyDaily"
@@ -25,12 +25,8 @@ def fetch_sst_anomaly():
     )
 
     # Determine project root safely
-    try:
-        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    except NameError:
-        # Running inside a notebook in code/ folder, go one level up to project root
-        project_root = os.path.abspath(os.path.join(os.getcwd(), ".."))
-
+    from pathlib import Path
+    project_root = Path(__file__).resolve().parents[1] if '__file__' in globals() else Path.cwd()
 
     # Build folder path relative to project root
     folder_path = os.path.join(
