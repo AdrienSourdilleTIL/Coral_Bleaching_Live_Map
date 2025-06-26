@@ -5,7 +5,7 @@ from pathlib import Path
 import geopandas as gpd
 import pandas as pd
 import matplotlib.pyplot as plt
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Resolve project root
 project_root = Path(__file__).resolve().parents[1]
@@ -39,7 +39,7 @@ mean_dhw = sst_in_gbr['DHW'].mean()
 print(f"Average DHW inside GBR zone: {mean_dhw:.2f}°C·weeks")
 
 # Current date
-current_date = datetime.now().strftime("%Y-%m-%d")
+current_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
 # Plot all DHW points (unfiltered)
 fig, ax = plt.subplots(figsize=(10, 8))
