@@ -4,7 +4,7 @@ This project monitors sea surface temperature anomalies (SSTAs) and coral bleach
 
 It is intended to raise awareness of marine heatwaves and coral bleaching events linked to climate change.
 
-## 📈 Outputs
+## Outputs
 
 ### 1. Daily Average Sea Surface Temperature Anomaly (GBR)
 ![SST Anomaly Time Series](output/sst_anomaly_timeseries.png)
